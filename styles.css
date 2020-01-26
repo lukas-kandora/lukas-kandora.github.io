@@ -1,0 +1,151 @@
+:root {
+  --node-radius: 25px; /* radius of a node */
+  --layer-gap: 10px; /* distance between node layers */
+  --edge-v-overflow: calc(.292893 * var(--node-radius)); /* edge extension above and below layer-gap */
+  --edge-h-overflow: calc(.292893 * var(--node-radius)); /* edge extension left and right to nodes */
+
+  /* style basis */
+  background-color: rgb(44, 60, 61);
+}
+
+body {
+  /* center content on viewport*/
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+
+  min-width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.tree-container {
+  padding: var(--node-radius);
+
+  background-color: rgba(0, 0, 0, 0.125);
+  transition: background-color 300ms linear;
+}
+
+.root {
+  --fg-color: rgb(219, 224, 224);
+  font-size: 2em;
+}
+
+.tree {
+  /* layout tree */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  
+  /* position for ::before */
+  position: relative;
+
+  /* prevent hover to kick in only via .tree */
+  pointer-events: none;
+}
+
+.tree:not(.root) {
+  /* add margin for non-root trees */
+  margin-top: calc(2 * var(--node-radius) + var(--layer-gap));
+}
+
+/* place tree children */
+.left-child { order: -1; }
+.node { order: 0; }
+.right-child { order: 1; }
+
+/* edge drawing */
+.right-child > .left-child::before,
+.left-child > .right-child::before {
+  content: '';
+  
+  position: absolute;
+  top: calc(-1 * (var(--edge-v-overflow) + 2 * var(--layer-gap) + 2 * var(--node-radius)));
+  width: calc(100% + 2 * var(--edge-h-overflow));
+  height: calc(2 * var(--edge-v-overflow) + var(--layer-gap));
+}
+
+/* left edge specification */
+.left-child > .right-child::before {
+  background-image: 
+    linear-gradient(to top left,
+      transparent calc(50% - 1.5px),
+      var(--fg-color) calc(50% - 1px),
+      var(--fg-color) calc(50% + 1px),
+      transparent calc(50% + 1.5px));
+}
+
+/* right edge specification */
+.right-child > .left-child::before {
+  background-image: 
+    linear-gradient(to top right,
+      transparent calc(50% - 1.5px),
+      var(--fg-color) calc(50% - 1px),
+      var(--fg-color) calc(50% + 1px),
+      transparent calc(50% + 1.5px));
+}
+
+.node {
+  /* center text content */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* size */
+  width: calc(2 * var(--node-radius));
+  height: calc(2 * var(--node-radius));
+  
+  /* appearance */
+  color: var(--fg-color);
+
+  border-color: var(--fg-color);
+  border-radius: 50%;
+  border-style: solid;
+  box-sizing: border-box;
+  
+  /* reactivate hover */
+  pointer-events: auto;
+
+  /* animate */
+  transition: border-color 300ms;
+}
+
+.leaf > .node {
+  border-style: dotted;
+}
+
+/* hover effects */
+
+.tree-container:hover {
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.tree:hover > .node,
+.tree:hover > .tree::before,
+.node:hover ~ .tree:not(:hover) .node,
+.node:hover ~ .tree:not(:hover) .tree::before {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.75));
+  transition: filter 100ms linear;
+}
+
+.tree:hover > .node,
+.tree:hover > .tree::before {
+  --fg-color: rgb(209, 161, 154);
+}
+
+.node:hover ~ .tree:not(:hover) .node,
+.node:hover ~ .tree:not(:hover) .tree::before {
+  --fg-color: rgb(209, 208, 154);
+}
+
+.tree:hover > .node:hover {
+  --fg-color: rgb(187, 154, 209);
+}
+
+/* controls */
+
+.controls {
+  display: flex;
+  justify-content: center;
+}
